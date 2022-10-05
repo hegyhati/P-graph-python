@@ -1,0 +1,57 @@
+{
+    "materials" : {
+        "A" : { "displayname": "A" },
+        "B" : { "displayname": "B" },
+        "C" : { "displayname": "C" },
+        "D" : { "displayname": "D" },
+        "E" : { "displayname": "E" },
+        "F" : { "displayname": "F" },
+        "G" : { "displayname": "G" },
+        "H" : { "displayname": "H" },
+        "I" : { "displayname": "I" },
+        "J" : { "displayname": "J" },
+        "K" : { "displayname": "K" },
+        "L" : { "displayname": "L" }
+    },
+    "operating units" : [
+        {
+            "displayname": "O1",
+            "inputs" : ["C"],
+            "outputs" : ["A", "F"]
+        },
+        {
+            "displayname": "O2",
+            "inputs" : ["D"],
+            "outputs" : ["A", "B"]
+        },
+        {
+            "displayname": "O3",
+            "inputs" : ["E","F"],
+            "outputs" : ["C"]
+        },
+        {
+            "displayname": "O4",
+            "inputs" : ["F", "G"],
+            "outputs" : ["C", "D"]
+        },
+        {
+            "displayname": "O5",
+            "inputs" : ["G","H"],
+            "outputs" : ["D"]
+        },
+        {
+            "displayname": "O6",
+            "inputs" : ["J"],
+            "outputs" : ["F"]
+        },
+        {
+            "displayname": "O7",
+            "inputs" : ["K", "L"],
+            "outputs" : ["H"]
+        }
+    ],    
+    "problem" : {
+        "products": ["A"],
+        "raw materials": ["I", "J", "K", "L", "E", "G"]
+    }
+}
