@@ -1,51 +1,51 @@
 {
     "materials" : {
-        "A" : { "displayname": "A" },
-        "B" : { "displayname": "B" },
-        "C" : { "displayname": "C" },
-        "D" : { "displayname": "D" },
-        "E" : { "displayname": "E" },
-        "F" : { "displayname": "F" },
-        "G" : { "displayname": "G" },
-        "H" : { "displayname": "H" },
-        "I" : { "displayname": "I" },
-        "J" : { "displayname": "J" },
-        "K" : { "displayname": "K" },
-        "L" : { "displayname": "L" }
+        "A" : { "display_name": "A" },
+        "B" : { "display_name": "B" },
+        "C" : { "display_name": "C" },
+        "D" : { "display_name": "D" },
+        "E" : { "display_name": "E" },
+        "F" : { "display_name": "F" },
+        "G" : { "display_name": "G" },
+        "H" : { "display_name": "H" },
+        "I" : { "display_name": "I" },
+        "J" : { "display_name": "J" },
+        "K" : { "display_name": "K" },
+        "L" : { "display_name": "L" }
     },
     "operating units" : [
         {
-            "displayname": "O1",
+            "display_name": "O1",
             "inputs" : ["C"],
             "outputs" : ["A", "F"]
         },
         {
-            "displayname": "O2",
+            "display_name": "O2",
             "inputs" : ["D"],
             "outputs" : ["A", "B"]
         },
         {
-            "displayname": "O3",
+            "display_name": "O3",
             "inputs" : ["E","F"],
             "outputs" : ["C"]
         },
         {
-            "displayname": "O4",
+            "display_name": "O4",
             "inputs" : ["F", "G"],
             "outputs" : ["C", "D"]
         },
         {
-            "displayname": "O5",
+            "display_name": "O5",
             "inputs" : ["G","H"],
             "outputs" : ["D"]
         },
         {
-            "displayname": "O6",
+            "display_name": "O6",
             "inputs" : ["J"],
             "outputs" : ["F"]
         },
         {
-            "displayname": "O7",
+            "display_name": "O7",
             "inputs" : ["K", "L"],
             "outputs" : ["H"]
         }
