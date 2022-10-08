@@ -13,7 +13,7 @@
         "K" : { "display_name": "K" },
         "L" : { "display_name": "L" }
     },
-    "operating units" : [
+    "operating_units" : [
         {
             "display_name": "O1",
             "inputs" : ["C"],
@@ -52,6 +52,6 @@
     ],    
     "problem" : {
         "products": ["A"],
-        "raw materials": ["I", "J", "K", "L", "E", "G"]
+        "raw_materials": ["I", "J", "K", "L", "E", "G"]
     }
 }

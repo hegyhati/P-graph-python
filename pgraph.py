@@ -36,14 +36,44 @@ class P_graph:
             inputs={self.materials[m] for m in o["inputs"]},
             outputs={self.materials[m] for m in o["outputs"]},
             display_name=o["display_name"]
-        ) for o in data["operating units"]] # should be set
+        ) for o in data["operating_units"]] # should be set
 
     def __str__(self) -> str:
         return f"""
             M = {{ {", ".join(m.display_name for m in self.materials.values())} }}
             O = {{ {", ".join(o.display_name for o in self.operating_units)} }}
         """
+    
+    def get_producers(self, material: Material):
+        return {o for o in self.operating_units if material in o.outputs}
+    
+    def get_consumers(self, material: Material):
+        return {o for o in self.operating_units if material in o.inputs}
+
+class PNS:
+    def __init__(self, filename: str = None, data: dict = None) -> None:
+        if filename:
+            with open(filename) as file:
+                data = json.load(file)
+
+        if data:
+            self.p_graph = P_graph(data=data)
+            self.products = {self.p_graph.materials[id] for id in data["problem"]["products"]}
+            self.raw_materials = {self.p_graph.materials[id] for id in data["problem"]["raw_materials"]}
+        else:
+            raise ValueError("No data or filename provided")
+    
+    def __str__(self) -> str:
+        return f"""
+            P-graph:  {self.p_graph}
+            Products: {", ".join([m.display_name for m in self.products])}
+            Raw materials: {", ".join([m.display_name for m in self.raw_materials])}
+        """
+
+    
+
+    
 
 
 if __name__ == "__main__":
-    print(P_graph("examples/ThePgraph.json"))
+    print(PNS("examples/ThePgraph.json"))
