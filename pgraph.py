@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import json
-from typing import FrozenSet, Set
+from typing import FrozenSet, Set, Dict
+from itertools import combinations, compress
 
 
 @dataclass(frozen=True)
@@ -119,9 +120,56 @@ class PNS(P_graph):
         # self.raw_materials.intersection_update(self.materials) # necessity will be decided later
         self.operating_units = final_units 
 
+    def generate_solution_structures_by_SSG(self) -> Set["Solution_Structure"]:
+        decisions = {}
+        return self._SSG_subroutine(set(), set(), set(), self.products)
+    
+    def _SSG_subroutine(self, included: Set[Operating_unit], excluded: Set[Operating_unit], decided_materials: Set[Material], undecided_materials: Set[Material]) -> Set["Solution_Structure"]:
+        undecided_materials = undecided_materials.copy()
+
+        if not undecided_materials:
+            return {Solution_Structure(self,included)}
+
+        m = undecided_materials.pop()
+        m_producers = self.get_producers({m})
+        if not m_producers - excluded:
+            return set()
+        
+        undecided_m_producers = m_producers - excluded - included
+        if not undecided_m_producers:
+            return self._SSG_subroutine(included, excluded, decided_materials.union({m}), undecided_materials)
+        
+        decisions = {
+            frozenset(include) 
+            for size in range(0 if m_producers.intersection(included) else 1, len(undecided_m_producers)+1)
+            for include in combinations(undecided_m_producers,size) 
+        }
+
+        
+        return {
+            solution 
+            for decision in decisions
+            for solution in self._SSG_subroutine(
+                included.union(decision), 
+                excluded.union(undecided_m_producers.difference(decision)),
+                decided_materials.union({m}),
+                undecided_materials.union(self.get_inputs(decision) - decided_materials - {m} - self.raw_materials)
+            )
+        }
+
+
+class Solution_Structure:
+    def __init__(self, problem:PNS, inclusion:Set[Operating_unit]):
+        self.problem = problem
+        self.operating_units = inclusion.copy()
+    
+    def __str__(self) -> str:
+        return f"Included units: {pretty_list([o.display_name for o in self.operating_units])}"
 
 if __name__ == "__main__":
-    pns = PNS("examples/MSG_Example.json")
+    pns = PNS("examples/ThePgraph.json")
     print(pns)
     pns.reduce_by_MSG()
     print(pns)
+    for solution in pns.generate_solution_structures_by_SSG():
+        print(solution)
