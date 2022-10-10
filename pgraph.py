@@ -8,6 +8,8 @@ class Material():
     display_name: str
     id: str
 
+def pretty_list(l:list):
+    return ", ".join(sorted(l))
 
 @dataclass(frozen=True)
 class Operating_unit():
@@ -46,8 +48,8 @@ class P_graph:
 
     def __str__(self) -> str:
         return f"""
-            M = {{ {", ".join([m.display_name for m in self.materials.values()])} }}
-            O = {{ {", ".join([o.display_name for o in self.operating_units])} }}
+            M = {{ {pretty_list([m.display_name for m in self.materials.values()])} }}
+            O = {{ {pretty_list([o.display_name for o in self.operating_units])} }}
         """
     
     def get_producers(self, materials: Set[Material]) -> Set[Operating_unit]:
@@ -81,8 +83,8 @@ class PNS(P_graph):
     def __str__(self) -> str:
         return f"""
             P-graph:  {super().__str__()}
-            Products: {", ".join([m.display_name for m in self.products])}
-            Raw materials: {", ".join([m.display_name for m in self.raw_materials])}
+            Products: {pretty_list([m.display_name for m in self.products])}
+            Raw materials: {pretty_list([m.display_name for m in self.raw_materials])}
         """
     
     def reduce_by_MSG(self):
@@ -94,12 +96,14 @@ class PNS(P_graph):
             m = not_produced_materials.pop()
             possible_materials.remove(m)
             m_consumers = self.get_consumers({m})
-            possible_units -= m_consumers
+            possible_units.difference_update(m_consumers)
             not_produced_materials.update(self.get_outputs(m_consumers) - self.get_outputs(possible_units) - self.raw_materials)
         
         if not self.products.issubset(possible_materials):
             raise ValueError("There is no solution structure")
         
+        self.operating_units = possible_units
+
         to_be_produced = self.products.copy()
         final_materials = set()
         final_units = set()
@@ -117,7 +121,7 @@ class PNS(P_graph):
 
 
 if __name__ == "__main__":
-    pns = PNS("examples/ThePgraph.json")
+    pns = PNS("examples/MSG_Example.json")
     print(pns)
     pns.reduce_by_MSG()
     print(pns)

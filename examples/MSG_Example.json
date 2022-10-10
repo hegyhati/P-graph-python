@@ -1,0 +1,84 @@
+{
+    "origin" : "https://doi.org/10.1016/0098-1354(93)80074-W",
+    "materials" : {
+        "A" : { "display_name": "A" },
+        "B" : { "display_name": "B" },
+        "C" : { "display_name": "C" },
+        "D" : { "display_name": "D" },
+        "E" : { "display_name": "E" },
+        "F" : { "display_name": "F" },
+        "G" : { "display_name": "G" },
+        "H" : { "display_name": "H" },
+        "I" : { "display_name": "I" },
+        "J" : { "display_name": "J" },
+        "K" : { "display_name": "K" },
+        "L" : { "display_name": "L" },
+        "M" : { "display_name": "M" },
+        "N" : { "display_name": "N" },
+        "Q" : { "display_name": "Q" },
+        "T" : { "display_name": "T" },
+        "U" : { "display_name": "U" },
+        "V" : { "display_name": "V" }
+    },
+    "operating_units" : [
+        {
+            "display_name": "O1",
+            "inputs" : [ "C", "D", "F" ],
+            "outputs" : [ "A" ]
+        },
+        {
+            "display_name": "O2",
+            "inputs" : [ "D" ],
+            "outputs" : [ "G", "B" ]
+        },
+        {
+            "display_name": "O3",
+            "inputs" : [ "E" ],
+            "outputs" : [ "B", "U" ]
+        },
+        {
+            "display_name": "O4",
+            "inputs" : [ "F", "G" ],
+            "outputs" : [ "C", "D" ]
+        },
+        {
+            "display_name": "O5",
+            "inputs" : [ "G", "H" ],
+            "outputs" : [ "D" ]
+        },
+        {
+            "display_name": "O6",
+            "inputs" : [ "H", "I" ],
+            "outputs" : [ "E" ]
+        },
+        {
+            "display_name": "O7",
+            "inputs" : [ "J", "K" ],
+            "outputs" : [ "E" ]
+        },
+        {
+            "display_name": "O8",
+            "inputs" : [ "M" ],
+            "outputs" : [ "G" ]
+        },
+        {
+            "display_name": "O9",
+            "inputs" : [ "N", "Q" ],
+            "outputs" : [ "H" ]
+        },
+        {
+            "display_name": "O10",
+            "inputs" : [ "T", "U" ],
+            "outputs" : [ "I" ]
+        },
+        {
+            "display_name": "O11",
+            "inputs" : [ "V" ],
+            "outputs" : [ "J" ]
+        }
+    ],    
+    "problem" : {
+        "products": ["B"],
+        "raw_materials": ["F", "H", "M", "T"]
+    }
+}
