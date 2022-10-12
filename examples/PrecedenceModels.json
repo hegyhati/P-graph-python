@@ -1,0 +1,282 @@
+{
+    "materials": {
+        "Yij-Free": {
+            "display_name": "Yij-Free",
+            "description": "Binary variable indicating whether task i is assigned to unit j",
+            "gmpl": "var Y{I, J} binary;"
+        },
+        "Yij-Allowing": {
+            "display_name": "Yij-Allowing",
+            "description": "Concept material indicating that all of the tasks are performed by at least one unit."
+        },
+        "Yij-Exact": {
+            "display_name": "Yij-Exact",
+            "description": "Concept material indicating that all of the tasks are performed by exactly one unit."
+        },
+        "Si-Exact": {
+            "display_name": "Si-Exact",
+            "description": "Continuous non-negative variable indicating the starting time of task i.",
+            "gmpl": "var S{I} >= 0;"
+        },
+        "Ci-Free" : {
+            "display_name" : "Ci-Free",
+            "description" : "Non-negative continuous variable later used for the completion of a task.",
+            "gmpl": "var C{I} >= 0;"
+        },
+        "Ci-Weak" : {
+            "display_name" : "Ci-Weak",
+            "description" : "Concept material indicating that Ci is at least Si"
+        },
+        "Ci-Allowing" : {
+            "display_name" : "Ci-Allowing",
+            "description" : "Concept material indicating that Ci is at least the completion time."
+        },
+        "Ci-Exact" : {
+            "display_name" : "Ci-Exact",
+            "description" : "Concept material indicating that Ci is exactly the completion time."
+        },
+        "MS-Free" : {
+            "display_name" : "MS-Free",
+            "description" : "Non-negative continuous variable later used for makespan.",
+            "gmpl" : "var MS >= 0;"
+        },
+        "MS-Allowing" : {
+            "display_name" : "MS",
+            "description" : "Concept material indicating that MS is at least the makespan."
+        },
+        "UIS-Precedence" : {
+            "display_name" : "UIS-Precedence",
+            "description" : "Concept material indicating that all production precedences are met with UIS policy."
+        },
+        "NIS-Precedence" : {
+            "display_name" : "NIS-Precedence",
+            "description" : "Concept material indicating that all production precedences are met with NIS policy."
+        }
+    },
+    "operating_units": [
+        {
+            "display_name": "Allowing Assignment",
+            "inputs": [
+                "Yij-Free"
+            ],
+            "outputs": [
+                "Yij-Allowing"
+            ],
+            "description": "Constraint to enforce that each task is performed by at least one unit",
+            "gmpl": "s.t. Allowing_Assignment {i in I} : sum {j in Ji[i]} Y[i,j] >= 1;"
+        },
+        {
+            "display_name": "Exact Assignment",
+            "inputs": [
+                "Yij-Free"
+            ],
+            "outputs": [
+                "Yij-Exact"
+            ],
+            "description": "Constraint to enforce that each task is performed by exactly one unit",
+            "gmpl": "s.t. Exact_Assignment {i in I} : sum {j in Ji[i]} Y[i,j] = 1;"
+        },
+        {
+            "display_name": "Yij-Exact => Yij-Allowing",
+            "inputs": [
+                "Yij-Exact"
+            ],
+            "outputs": [
+                "Yij-Allowing"
+            ],
+            "description": "Logical O-node."
+        },
+        {
+            "display_name": "Weak Completion",
+            "inputs" : [
+                "Si-Exact",
+                "Ci-Free"
+            ],
+            "outputs" : [
+                "Ci-Weak"
+            ],
+            "description" : "Constraint enforcing that a task must end later than it starts.",
+            "gmpl" : "s.t. Weak_Completion {i in I} : C[i] >= S[i];"
+        },
+        {
+            "display_name": "Allowing Completion",
+            "inputs" : [
+                "Si-Exact",
+                "Ci-Free",
+                "Yij-Allowing"
+            ],
+            "outputs" : [
+                "Ci-Allowing"
+            ],
+            "description" : "Constraint enforcing that Ci is at least at completion.",
+            "gmpl" : "s.t. Allowing_Completion {i in I} : C[i] >= S[i] + sum {j in Ji[i]} pt[i,j]*Y[i,j];"
+        },
+        {
+            "display_name": "Allowing Completion per Unit",
+            "inputs" : [
+                "Si-Exact",
+                "Ci-Free",
+                "Yij-Allowing"
+            ],
+            "outputs" : [
+                "Ci-Allowing"
+            ],
+            "description" : "Constraint enforcing that Ci is at least at completion.",
+            "gmpl" : "s.t. Allowing_Completion_per_Unit {i in I, j in Ji[i]} : C[i] >= S[i] + pt[i,j]*Y[i,j];"
+        },
+        {
+            "display_name": "Exact Completion",
+            "inputs" : [
+                "Si-Exact",
+                "Ci-Free",
+                "Yij-Allowing"
+            ],
+            "outputs" : [
+                "Ci-Exact"
+            ],
+            "description" : "Constraint enforcing that Ci is at least at completion.",
+            "gmpl" : "s.t. Exact_Completion {i in I} : C[i] = S[i] + sum {j in Ji[i]} pt[i,j]*Y[i,j];"
+        },
+        {
+            "display_name": "Ci-Exact => Ci-Allowing",
+            "inputs": [
+                "Ci-Exact"
+            ],
+            "outputs": [
+                "Ci-Allowing"
+            ],
+            "description": "Logical O-node."
+        },
+        {
+            "display_name": "Ci-Allowing => Ci-Weak",
+            "inputs": [
+                "Ci-Allowing"
+            ],
+            "outputs": [
+                "Ci-Weak"
+            ],
+            "description": "Logical O-node."
+        },
+        {
+            "display_name" : "Makespan Setter by Completion",
+            "inputs" : [
+                "Ci-Allowing",
+                "MS-Free"
+            ],
+            "outputs" : [
+                "MS-Allowing"
+            ],
+            "description" : "Constraint enforcing MS to be later than latest completion.",
+            "gmpl" : "s.t. Makespan_by_Completion {i in I}: MS >= C[i]; "
+        },
+        {
+            "display_name" : "Makespan Setter by Start",
+            "inputs" : [
+                "Si-Exact",
+                "Yij-Allowing",
+                "MS-Free"
+            ],
+            "outputs" : [
+                "MS-Allowing"
+            ],
+            "description" : "Constraint enforcing MS to be later than latest completion.",
+            "gmpl" : "s.t. Makespan_by_Start {i in I}: MS >= S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
+        },
+        {
+            "display_name" : "Makespan Setter by Start per Unit",
+            "inputs" : [
+                "Si-Exact",
+                "Yij-Allowing",
+                "MS-Free"
+            ],
+            "outputs" : [
+                "MS-Allowing"
+            ],
+            "description" : "Constraint enforcing MS to be later than latest completion.",
+            "gmpl" : "s.t. Makespan_by_Start_per_Unit {i in I, j in Ji[i]}: MS >= S[i] + pt[i,j]*Y[i,j];"
+        },
+        {
+            "display_name" : "Production Precedence by Completion UIS",
+            "inputs":[
+                "Si-Exact",
+                "Ci-Allowing"
+            ],
+            "outputs":[
+                "UIS-Precedence"
+            ],
+            "description" : "Constraint enforcing production precedences with UIS policy by completion variables.",
+            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in P} : S[ii] >= C[i];"
+        },
+        {
+            "display_name" : "Production Precedence by Start UIS",
+            "inputs":[
+                "Si-Exact",
+                "Yij-Allowing"
+            ],
+            "outputs":[
+                "UIS-Precedence"
+            ],
+            "description" : "Constraint enforcing production precedences with UIS policy by start variables.",
+            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in P} : S[ii] >= S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
+        },
+        {
+            "display_name" : "Production Precedence by Start per Unit UIS",
+            "inputs":[
+                "Si-Exact",
+                "Yij-Allowing"
+            ],
+            "outputs":[
+                "UIS-Precedence"
+            ],
+            "description" : "Constraint enforcing production precedences with UIS policy by start variables per unit.",
+            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in P, j in Ji[i]} : S[ii] >= S[i] + pt[i,j]*Y[i,j];"
+        },
+        {
+            "display_name" : "NIS-Precedence => UIS-Precedence",
+            "inputs" : [
+                "NIS-Precedence"
+            ],
+            "outputs" : [
+                "UIS-Precedence"
+            ],
+            "description" : "Logical O-node."
+        },
+        {
+            "display_name" : "Production Precedence by Completion NIS",
+            "inputs":[
+                "Si-Exact",
+                "Ci-Exact"
+            ],
+            "outputs":[
+                "NIS-Precedence"
+            ],
+            "description" : "Constraint enforcing production precedences with NIS policy by completion variables.",
+            "gmpl": "s.t. Precedence_by_Completion_NIS{ (i,ii) in P} : S[ii] = C[i];"
+        },
+        {
+            "display_name" : "Production Precedence by Start NIS",
+            "inputs":[
+                "Si-Exact",
+                "Yij-Exact"
+            ],
+            "outputs":[
+                "NIS-Precedence"
+            ],
+            "description" : "Constraint enforcing production precedences with NIS policy by start variables.",
+            "gmpl": "s.t. Precedence_by_Completion_NIS{ (i,ii) in P} : S[ii] = S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
+        }
+    ],
+    "problem": {
+        "products": [
+            "Yij-Allowing",
+            "MS-Allowing",
+            "UIS-Precedence"
+        ],
+        "raw_materials": [
+            "Yij-Free", 
+            "Si-Exact",
+            "Ci-Free",
+            "MS-Free"
+        ]
+    }
+}

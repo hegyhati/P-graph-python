@@ -167,9 +167,9 @@ class Solution_Structure:
         return f"Included units: {pretty_list([o.display_name for o in self.operating_units])}"
 
 if __name__ == "__main__":
-    pns = PNS("examples/ThePgraph.json")
+    pns = PNS("examples/PrecedenceModels.json")
     print(pns)
     pns.reduce_by_MSG()
     print(pns)
-    for solution in pns.generate_solution_structures_by_SSG():
-        print(solution)
+    for idx, solution in enumerate(pns.generate_solution_structures_by_SSG()):
+        print(idx, solution, "\n")
