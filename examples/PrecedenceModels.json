@@ -2,8 +2,8 @@
     "materials": {
         "Yij-Free": {
             "display_name": "Yij-Free",
-            "description": "Binary variable indicating whether task i is assigned to unit j",
-            "gmpl": "var Y{I, J} binary;"
+            "description": "Binary variable indicating whether task i is assigned to unit j for suitable i,j pairs.",
+            "gmpl": "var Y{I_in_J} binary;"
         },
         "Yij-Allowing": {
             "display_name": "Yij-Allowing",
@@ -205,7 +205,7 @@
                 "UIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with UIS policy by completion variables.",
-            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in P} : S[ii] >= C[i];"
+            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in I_precedes_II} : S[ii] >= C[i];"
         },
         {
             "display_name" : "Production Precedence by Start UIS",
@@ -217,7 +217,7 @@
                 "UIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with UIS policy by start variables.",
-            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in P} : S[ii] >= S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
+            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in I_precedes_II} : S[ii] >= S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
         },
         {
             "display_name" : "Production Precedence by Start per Unit UIS",
@@ -229,7 +229,7 @@
                 "UIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with UIS policy by start variables per unit.",
-            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in P, j in Ji[i]} : S[ii] >= S[i] + pt[i,j]*Y[i,j];"
+            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in I_precedes_II, j in Ji[i]} : S[ii] >= S[i] + pt[i,j]*Y[i,j];"
         },
         {
             "display_name" : "NIS-Precedence => UIS-Precedence",
@@ -251,7 +251,7 @@
                 "NIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with NIS policy by completion variables.",
-            "gmpl": "s.t. Precedence_by_Completion_NIS{ (i,ii) in P} : S[ii] = C[i];"
+            "gmpl": "s.t. Precedence_by_Completion_NIS{ (i,ii) in I_precedes_II} : S[ii] = C[i];"
         },
         {
             "display_name" : "Production Precedence by Start NIS",
@@ -263,14 +263,14 @@
                 "NIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with NIS policy by start variables.",
-            "gmpl": "s.t. Precedence_by_Completion_NIS{ (i,ii) in P} : S[ii] = S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
+            "gmpl": "s.t. Precedence_by_Completion_NIS{ (i,ii) in I_precedes_II} : S[ii] = S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
         }
     ],
     "problem": {
         "products": [
             "Yij-Allowing",
             "MS-Allowing",
-            "UIS-Precedence"
+            "IS-Precedence"
         ],
         "raw_materials": [
             "Yij-Free", 
@@ -278,5 +278,18 @@
             "Ci-Free",
             "MS-Free"
         ]
-    }
+    },
+    "global_statemensts": [
+        "set I;",
+        "set J;",
+        "set I_precedes_II in I cross I;",
+        "param NOVALUE := -1;",
+        "param pt{I,J}, default NOVALUE;",
+        "set Ij{j in J} := setof {i in I: pt[i,j] != NOVALUE} i;",
+        "set Ji{i in I} := setof {j in J: pt[i,j] != NOVALUE} j;",
+        "set I_in_J := setof{i in I, j in J[i]} (i,j);",
+        "set I_in_J_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,j,ii);",
+        "set I_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,ii);",
+        "#"
+    ]
 }
