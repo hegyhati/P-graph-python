@@ -84,6 +84,10 @@
         "Xijii-ZeroIfUnassigned" : {
             "display_name": "Xijii-ZeroIfUnassigned",
             "description": "Concept variable indicating that neither i is scheduled before ii or the other way around if either i or ii is assigned to another unit."
+        },
+        "Sequencing" : {
+            "display_name" : "Sequencing",
+            "descreption": "Concept material indicating that tasks assigned to the same units do not overlap."
         }
 
     },
@@ -478,19 +482,49 @@
                 "Xijii-Exactly1IfAssigned"
             ],
             "description" : "Logical O-node."
+        },
+        {
+            "display_name" : "Sequencing by Completion and Assignments",
+            "inputs" : [
+                "Si-Exact",
+                "Ci-Allowing",
+                "Yij-Allowing",
+                "Xijii-AtLeast1IfAssigned"
+            ],
+            "outputs" : [
+                "Sequencing"
+            ],
+            "description" : "Constraint to enforce starting time of a later task to be greater to an earlier task if assigned to the same unit.",
+            "gmpl" : "s.t. Sequencing_by_Completion_and_Assignments{(i,j,ii) in I_in_J_before_II} : S[ii] >= C[i] - M * ( 3 - Y[i,j] - Y[ii,j] - X[i,j,ii] );"
+        },
+        {
+            "display_name" : "Sequencing by Completion",
+            "inputs" : [
+                "Si-Exact",
+                "Ci-Allowing",
+                "Xijii-Exactly1IfAssigned",
+                "Xijii-ZeroIfUnassigned"
+            ],
+            "outputs" : [
+                "Sequencing"
+            ],
+            "description" : "Constraint to enforce starting time of a later task to be greater to an earlier task if assigned to the same unit.",
+            "gmpl" : "s.t. Sequencing_by_Completion_and_Assignments{(i,j,ii) in I_in_J_before_II} : S[ii] >= C[i] - M * ( 1 - X[i,j,ii] );"
         }
     ],
     "problem": {
         "products": [
             "Yij-Allowing",
             "MS-Allowing",
-            "UIS-Precedence"
+            "UIS-Precedence",
+            "Sequencing"
         ],
         "raw_materials": [
             "Yij-Free", 
             "Si-Exact",
             "Ci-Free",
-            "MS-Free"
+            "MS-Free",
+            "Xijii-Free"
         ]
     },
     "global_statemensts": [
@@ -504,6 +538,7 @@
         "set I_in_J := setof{i in I, j in J[i]} (i,j);",
         "set I_in_J_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,j,ii);",
         "set I_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,ii);",
+        "param M := sum{(i,j) in I_in_J} pt[i,j];",
         "#"
     ]
 }
