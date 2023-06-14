@@ -166,8 +166,9 @@ class Solution_Structure:
     def __str__(self) -> str:
         return f"Included units: {pretty_list([o.display_name for o in self.operating_units])}"
 
+from sys import argv
 if __name__ == "__main__":
-    pns = PNS("examples/PrecedenceModels.json")
+    pns = PNS(argv[1])
     print(pns)
     pns.reduce_by_MSG()
     print(pns)
