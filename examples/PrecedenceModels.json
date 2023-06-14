@@ -1,5 +1,9 @@
 {
     "materials": {
+        "FORBIDDENPRODUCT" : {
+            "display_name" : "FORBIDDENPRODUCT",
+            "description" : "Virtual raw material to easily exclude operating units for testing purposes."
+        },
         "Yij-Free": {
             "display_name": "Yij-Free",
             "description": "Binary variable indicating whether task i is assigned to unit j for suitable i,j pairs.",
@@ -72,14 +76,6 @@
         "Xijii-AtLeast1Always" : {
             "display_name": "Xijii-AtLeast1Always",
             "description": "Concept variable indicating that either i is scheduled before ii or the other way around on j regardless of assignments."
-        },
-        "Xijii-Exactly1IfAssigned" : {
-            "display_name": "Xijii-Exactly1IfAssigned",
-            "description": "Concept variable indicating that either i is scheduled before ii xor the other way around on j if assigned."
-        },
-        "Xijii-Exactly1Always" : {
-            "display_name": "Xijii-Exactly1Always",
-            "description": "Concept variable indicating that either i is scheduled before ii xor the other way around on j regardless of assignments."
         },
         "Xijii-ZeroIfUnassigned" : {
             "display_name": "Xijii-ZeroIfUnassigned",
@@ -355,7 +351,8 @@
                 "Xijii-Free"
             ],
             "outputs":[
-                "Xijii-Exactly1Always"
+                "Xijii-AtLeast1Always",
+                "Xijii-AtMost1Always"
             ],
             "description" : "Constraint enforcing that exactly one direction of unit specific sequencing variables are 1 for the same tasks.",
             "gmpl": "s.t. Sequence_Exactly_One_Direction_Always{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] = 1;"
@@ -410,50 +407,6 @@
             "gmpl": "s.t. Sequence_Zero_If_Not_Assigned_TaskWise_BothDirection{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] <= Y[i,j]; "
         },
         {
-            "display_name" : "Xijii at most & least 1 if assigned => Xijii exactly 1 if assigned",
-            "inputs" : [
-                "Xijii-AtMost1IfAssigned",
-                "Xijii-AtLeast1IfAssigned"
-            ],
-            "outputs" : [
-                "Xijii-Exactly1IfAssigned"
-            ],
-            "description" : "Logical O-node."
-        },
-        {
-            "display_name" : "Xijii exactly 1 if assigned => Xijii at most & least 1 if assigned",
-            "inputs" : [
-                "Xijii-Exactly1IfAssigned"
-            ],
-            "outputs" : [
-                "Xijii-AtMost1IfAssigned",
-                "Xijii-AtLeast1IfAssigned"
-            ],
-            "description" : "Logical O-node."
-        },
-        {
-            "display_name" : "Xijii at most & least 1 always => Xijii exactly 1 always",
-            "inputs" : [
-                "Xijii-AtMost1Always",
-                "Xijii-AtLeast1Always"
-            ],
-            "outputs" : [
-                "Xijii-Exactly1Always"
-            ],
-            "description" : "Logical O-node."
-        },
-        {
-            "display_name" : "Xijii exactly 1 always => Xijii at most & least 1 always",
-            "inputs" : [
-                "Xijii-Exactly1Always"
-            ],
-            "outputs" : [
-                "Xijii-AtMost1Always",
-                "Xijii-AtLeast1Always"
-            ],
-            "description" : "Logical O-node."
-        },
-        {
             "display_name" : "Xijii at most 1 always => Xijii at most 1 if assigned",
             "inputs" : [
                 "Xijii-AtMost1Always"
@@ -470,16 +423,6 @@
             ],
             "outputs" : [
                 "Xijii-AtLeast1IfAssigned"
-            ],
-            "description" : "Logical O-node."
-        },
-        {
-            "display_name" : "Xijii exactly 1 always => Xijii exactly 1 if assigned",
-            "inputs" : [
-                "Xijii-Exactly1Always"
-            ],
-            "outputs" : [
-                "Xijii-Exactly1IfAssigned"
             ],
             "description" : "Logical O-node."
         },
@@ -502,7 +445,8 @@
             "inputs" : [
                 "Si-Exact",
                 "Ci-Allowing",
-                "Xijii-Exactly1IfAssigned",
+                "Xijii-AtLeast1IfAssigned",
+                "Xijii-AtMost1IfAssigned",
                 "Xijii-ZeroIfUnassigned"
             ],
             "outputs" : [
@@ -524,7 +468,8 @@
             "Si-Exact",
             "Ci-Free",
             "MS-Free",
-            "Xijii-Free"
+            "Xijii-Free",
+            "FORBIDDENPRODUCT"
         ]
     },
     "global_statemensts": [
