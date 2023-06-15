@@ -1,0 +1,13 @@
+set I := A1 A2 A3 B1 B2;
+set J := U1 U2 U3;
+set I_precedes_II := (A1,A2) (A2,A3) (B1,B2);
+
+param pt :
+        U1  U2  U3 := 
+    A1  1   2   .
+    A2  .   .   4
+    A3  .   3   2
+    B1  5   .   1
+    B2  .   2   .
+    ;
+

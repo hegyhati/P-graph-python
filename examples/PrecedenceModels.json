@@ -50,16 +50,18 @@
         },
         "UIS-Precedence" : {
             "display_name" : "UIS-Precedence",
-            "description" : "Concept material indicating that all production precedences are met with UIS policy."
+            "description" : "Concept material indicating that all production precedences are met with UIS policy.",
+            "incompatible" : "NIS-Precedence"
         },
         "NIS-Precedence" : {
             "display_name" : "NIS-Precedence",
-            "description" : "Concept material indicating that all production precedences are met with NIS policy."
+            "description" : "Concept material indicating that all production precedences are met with NIS policy.",
+            "incompatible" : "UIS-Precedence"
         },
         "Xijii-Free" : {
             "display_name": "Xijii-Free",
             "description": "Binary variables later used used for sequencing of two tasks assigneable to the same unit.",
-            "gmp" : "var X{I_in_J_before_II} binary;"
+            "gmpl" : "var X{I_in_J_before_II} binary;"
         },
         "Xijii-AtMost1IfAssigned" : {
             "display_name": "Xijii-AtMost1IfAssigned",
@@ -75,11 +77,13 @@
         },
         "Xijii-AtLeast1Always" : {
             "display_name": "Xijii-AtLeast1Always",
-            "description": "Concept variable indicating that either i is scheduled before ii or the other way around on j regardless of assignments."
+            "description": "Concept variable indicating that either i is scheduled before ii or the other way around on j regardless of assignments.",
+            "incompatible" : ["Xijii-ZeroIfUnassigned"]
         },
         "Xijii-ZeroIfUnassigned" : {
             "display_name": "Xijii-ZeroIfUnassigned",
-            "description": "Concept variable indicating that neither i is scheduled before ii or the other way around if either i or ii is assigned to another unit."
+            "description": "Concept variable indicating that neither i is scheduled before ii or the other way around if either i or ii is assigned to another unit.",
+            "incompatible" : ["Xijii-AtLeast1Always"]
         },
         "Sequencing" : {
             "display_name" : "Sequencing",
@@ -266,16 +270,6 @@
             "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in I_precedes_II, j in Ji[i]} : S[ii] >= S[i] + pt[i,j]*Y[i,j];"
         },
         {
-            "display_name" : "NIS-Precedence => UIS-Precedence",
-            "inputs" : [
-                "NIS-Precedence"
-            ],
-            "outputs" : [
-                "UIS-Precedence"
-            ],
-            "description" : "Logical O-node."
-        },
-        {
             "display_name" : "Production Precedence by Completion NIS",
             "inputs":[
                 "Si-Exact",
@@ -332,7 +326,7 @@
                 "Xijii-AtLeast1IfAssigned"
             ],
             "description" : "Constraint enforcing that one direction of unit specific sequencing variables for same tasks has to be 1 if assigned to the unit.",
-            "gmpl": "s.t. Sequence_At_Most_One_Direction_If_Assigned{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] >= Y[i,j] + Y[ii,j] - 1;"
+            "gmpl": "s.t. Sequence_At_Least_One_Direction_If_Assigned{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] >= Y[i,j] + Y[ii,j] - 1;"
         },
         {
             "display_name" : "Sequence at most in 1 direction always",
@@ -343,7 +337,7 @@
                 "Xijii-AtLeast1Always"
             ],
             "description" : "Constraint enforcing that one direction of unit specific sequencing variables for same tasks has to be 1.",
-            "gmpl": "s.t. Sequence_At_Most_One_Direction_Always{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] >= 1;"
+            "gmpl": "s.t. Sequence_At_Least_One_Direction_Always{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] >= 1;"
         },
         {
             "display_name" : "Sequence in exactly 1 direction always",
@@ -472,18 +466,25 @@
             "FORBIDDENPRODUCT"
         ]
     },
-    "global_statemensts": [
-        "set I;",
-        "set J;",
-        "set I_precedes_II in I cross I;",
-        "param NOVALUE := -1;",
-        "param pt{I,J}, default NOVALUE;",
-        "set Ij{j in J} := setof {i in I: pt[i,j] != NOVALUE} i;",
-        "set Ji{i in I} := setof {j in J: pt[i,j] != NOVALUE} j;",
-        "set I_in_J := setof{i in I, j in J[i]} (i,j);",
-        "set I_in_J_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,j,ii);",
-        "set I_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,ii);",
-        "param M := sum{(i,j) in I_in_J} pt[i,j];",
-        "#"
-    ]
+    "global_statements": {
+        "pre" : [
+            "set I;",
+            "set J;",
+            "set I_precedes_II within I cross I;",
+            "param NOVALUE := -1;",
+            "param pt{I,J}, default NOVALUE;",
+            "set Ij{j in J} := setof {i in I: pt[i,j] != NOVALUE} i;",
+            "set Ji{i in I} := setof {j in J: pt[i,j] != NOVALUE} j;",
+            "set I_in_J := setof{i in I, j in Ji[i]} (i,j);",
+            "set I_in_J_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,j,ii);",
+            "set I_before_II := setof{i in I, ii in I, j in Ji[i] inter Ji[ii]: i!=ii} (i,ii);",
+            "param M := sum{(i,j) in I_in_J} pt[i,j];",
+            "#"
+        ],
+        "post" : [
+            "minimize MAKESPAN: MS;",
+            "solve;",
+            "printf \"%d\\n\", MS;"
+        ]
+    }
 }

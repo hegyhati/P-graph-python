@@ -8,6 +8,7 @@ from itertools import combinations, compress
 class Material():
     display_name: str
     id: str
+    incompatible: FrozenSet[str]
 
 def pretty_list(l:list):
     return ", ".join(sorted(l))
@@ -17,6 +18,7 @@ class Operating_unit():
     display_name: str
     inputs: FrozenSet[Material]
     outputs: FrozenSet[Material]
+    idx: int
 
     def get_materials(self) -> Set[Material]:
         return self.inputs.union(self.outputs)
@@ -39,13 +41,15 @@ class P_graph:
     def _init_from_data_(self, data: dict) -> None:
         self.materials = {id: Material(
             id=id,
-            display_name=m["display_name"]
+            display_name=m["display_name"],
+            incompatible=frozenset(m["incompatible"]) if "incompatible" in m else frozenset()
         ) for id, m in data["materials"].items()}
         self.operating_units = {Operating_unit(
             inputs={self.materials[m] for m in o["inputs"]},
             outputs={self.materials[m] for m in o["outputs"]},
-            display_name=o["display_name"]
-        ) for o in data["operating_units"]}
+            display_name=o["display_name"],
+            idx=idx
+        ) for idx,o in enumerate(data["operating_units"])}
 
     def __str__(self) -> str:
         return f"""
@@ -117,11 +121,10 @@ class PNS(P_graph):
             to_be_produced.update(self.get_inputs(m_producers) - final_materials - self.raw_materials)
         
         self.materials = {m.id : m for m in self.get_materials(final_units)}
-        # self.raw_materials.intersection_update(self.materials) # necessity will be decided later
+        self.raw_materials = {material for material in self.raw_materials if material.id in self.materials}
         self.operating_units = final_units 
 
     def generate_solution_structures_by_SSG(self) -> Set["Solution_Structure"]:
-        decisions = {}
         return self._SSG_subroutine(set(), set(), set(), self.products)
     
     def _SSG_subroutine(self, included: Set[Operating_unit], excluded: Set[Operating_unit], decided_materials: Set[Material], undecided_materials: Set[Material]) -> Set["Solution_Structure"]:
@@ -144,7 +147,6 @@ class PNS(P_graph):
             for size in range(0 if m_producers.intersection(included) else 1, len(undecided_m_producers)+1)
             for include in combinations(undecided_m_producers,size) 
         }
-
         
         return {
             solution 
@@ -171,6 +173,7 @@ if __name__ == "__main__":
     pns = PNS(argv[1])
     print(pns)
     pns.reduce_by_MSG()
-    print(pns)
+    print(pns, len(pns.operating_units))
     for idx, solution in enumerate(pns.generate_solution_structures_by_SSG()):
         print(idx, solution, "\n")
+    print(pns, len(pns.operating_units))
