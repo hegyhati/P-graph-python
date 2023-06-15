@@ -255,7 +255,7 @@
                 "UIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with UIS policy by start variables.",
-            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in I_precedes_II} : S[ii] >= S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
+            "gmpl": "s.t. Precedence_by_Start_UIS{ (i,ii) in I_precedes_II} : S[ii] >= S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
         },
         {
             "display_name" : "Production Precedence by Start per Unit UIS",
@@ -267,7 +267,7 @@
                 "UIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with UIS policy by start variables per unit.",
-            "gmpl": "s.t. Precedence_by_Completion_UIS{ (i,ii) in I_precedes_II, j in Ji[i]} : S[ii] >= S[i] + pt[i,j]*Y[i,j];"
+            "gmpl": "s.t. Precedence_by_Start_Per_Unit_UIS{ (i,ii) in I_precedes_II, j in Ji[i]} : S[ii] >= S[i] + pt[i,j]*Y[i,j];"
         },
         {
             "display_name" : "Production Precedence by Completion NIS",
@@ -291,7 +291,7 @@
                 "NIS-Precedence"
             ],
             "description" : "Constraint enforcing production precedences with NIS policy by start variables.",
-            "gmpl": "s.t. Precedence_by_Completion_NIS{ (i,ii) in I_precedes_II} : S[ii] = S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
+            "gmpl": "s.t. Precedence_by_Start_NIS{ (i,ii) in I_precedes_II} : S[ii] = S[i] + sum{j in Ji[i]} pt[i,j]*Y[i,j];"
         },
         {
             "display_name" : "Sequence at most in 1 direction if assigned",
@@ -398,7 +398,7 @@
                 "Xijii-AtMost1IfAssigned"
             ],
             "description" : "Constraint enforcing that unit specific sequencing variables are 0 if either tasks are assigned to another unit.",
-            "gmpl": "s.t. Sequence_Zero_If_Not_Assigned_TaskWise_BothDirection{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] <= Y[i,j]; "
+            "gmpl": "s.t. Sequence_Zero_If_Not_Assigned_TaskWise_BothDirection_Otherwise_At_Least_One{ (i,j,ii) in I_in_J_before_II} : X[i,j,ii] + X[ii,j,i] <= Y[i,j]; "
         },
         {
             "display_name" : "Xijii at most 1 always => Xijii at most 1 if assigned",
@@ -447,7 +447,7 @@
                 "Sequencing"
             ],
             "description" : "Constraint to enforce starting time of a later task to be greater to an earlier task if assigned to the same unit.",
-            "gmpl" : "s.t. Sequencing_by_Completion_and_Assignments{(i,j,ii) in I_in_J_before_II} : S[ii] >= C[i] - M * ( 1 - X[i,j,ii] );"
+            "gmpl" : "s.t. Sequencing_by_Completion{(i,j,ii) in I_in_J_before_II} : S[ii] >= C[i] - M * ( 1 - X[i,j,ii] );"
         }
     ],
     "problem": {

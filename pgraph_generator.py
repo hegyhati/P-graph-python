@@ -28,7 +28,7 @@ class Generator(PNS):
                 if incompatible in material_ids:
                     return
         if self.counter < self.limit :
-            with open(os.path.join(self.directory, f"{self.counter}.mod"), "w") as f:
+            with open(os.path.join(self.directory, f"{self.counter:08}.mod"), "w") as f:
                 for line in self.data["global_statements"]["pre"]:
                     f.write(line + "\n")
                 f.write("\n")
@@ -76,9 +76,8 @@ class Generator(PNS):
                 )
 
     def run_tests(self, example:str):
-        for model in range(self.limit):
-            print(f"glpsol -m {os.path.join(self.directory, f'{model}.mod')} -d {example} -y {os.path.join(self.directory, f'{model}.out')}")
-            os.system(f"glpsol -m {os.path.join(self.directory, f'{model}.mod')} -d {example} -y {os.path.join(self.directory, f'{model}.out')}")
+        for model in range(self.counter):
+            os.system(f"glpsol -m {os.path.join(self.directory, f'{model:08}.mod')} -d {example} -y {os.path.join(self.directory, f'{model:08}.out')}")
 
 
 
@@ -91,4 +90,4 @@ if __name__ == "__main__":
     print(generator, len(generator.operating_units))
     generator.generate_models()
     print(generator, len(generator.operating_units))
-    # generator.run_tests('examples/precedence.dat')
+    generator.run_tests('examples/ferrernadal.dat')

@@ -1,0 +1,19 @@
+set I := A1 A2 A3 B1 B2 B3 C1 C2 C3 D1 D2 D3;
+set J := Eq1 Eq2 Eq3 Eq4;
+set I_precedes_II := (A1,A2) (A2,A3) (B1,B2) (B2,B3) (C1,C2) (C2,C3) (D1,D2) (D2,D3);
+
+param pt :
+        Eq1 Eq2 Eq3 Eq4 :=
+    A1  6   .   .   .
+    A2  .   .   9   .
+    A3  .   .   .   7
+    B1  .   9   .   .
+    B2  .   .   15  .
+    B3  .   .   .   17
+    C1  .   .   .   8
+    C2  14  .   .   .
+    C3  .   16  .   .
+    D1  .   7   .   .
+    D2  .   .   11  .
+    D3  4   .   .   .
+;
